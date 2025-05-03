@@ -4,21 +4,28 @@ CC = gcc
 # Arquivo de saída
 OUT = app
 
-# Arquivo-fonte
-SRC = src/main.c
+# Diretórios dos arquivos
+SRC_DIR = src
+INC_DIR = include
+
+# Arquivos-fonte
+SRC = $(SRC_DIR)/main.c $(SRC_DIR)/api.c
 
 # Flags do libcurl (usando pkg-config)
-CFLAGS = $(shell pkg-config --cflags libcurl)
+CFLAGS = -Wall -Wextra -g3 -I$(INC_DIR) $(shell pkg-config --cflags libcurl)
 LDFLAGS = $(shell pkg-config --libs libcurl)
 
 # Regra padrão
-all:
+all: $(OUT)
+
+# Compilação do binário
+$(OUT): $(SRC)
 	$(CC) $(SRC) -o $(OUT) $(CFLAGS) $(LDFLAGS)
 
 # Executa o programa após compilar
 run: all
 	./$(OUT)
 
-# Limpa o binário
+# Limpa o binário e arquivos objeto
 clean:
-	rm -f $(OUT)
+	rm -f $(OUT) $(SRC_DIR)/*.o

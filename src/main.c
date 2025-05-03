@@ -1,28 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef struct Planta {
-    char nome[50];
-    char efeito[100];
-    int dias_para_colher;
-    int valor_magico;
-    struct Planta* prox;
-} Planta;
-
-typedef struct {
-    Planta* inicio;
-    Planta* fim;
-} Fila;
-
+#include "../include/api.h" 
 
 void inicializarFila(Fila* fila) {
     fila->inicio = NULL;
     fila->fim = NULL;
 }
 
-Planta* criarPlanta(char nome[], char efeito[], int dias, int valor) {
-    Planta* nova = (Planta*) malloc(sizeof(Planta));
+Planta* criarPlanta(const char* nome, const char* efeito, int dias, int valor) {
+    Planta* nova = (Planta*)malloc(sizeof(Planta));
+    if (nova == NULL) {
+        printf("Erro ao alocar memória para a planta.\n");
+        return NULL;
+    }
     strcpy(nova->nome, nome);
     strcpy(nova->efeito, efeito);
     nova->dias_para_colher = dias;
@@ -31,22 +22,52 @@ Planta* criarPlanta(char nome[], char efeito[], int dias, int valor) {
     return nova;
 }
 
-void plantar(Fila* fila) { //usando FILA 
-    char nome[50] = "Flor do Gelo"; // futuramente vindo da IA
-    char efeito[100] = "Congela inimigos";
+// Função para consultar a API e obter nome e efeito da planta
+int consultar_nome_efeito_planta(char* nome, char* efeito) {
+    const char* api_key = "sua_api_key_aqui";  // Substitua pela sua chave de API
+    const char* prompt_text = "Gerar um nome e efeito mágico para uma planta.";
+
+    // Aqui estamos assumindo que a API irá retornar um JSON com "nome" e "efeito".
+    // Você precisará de um parser de JSON para extrair essas informações da resposta.
+    char resposta[1024];
+
+    if (consultar_api(api_key, prompt_text) == 0) {
+        // A função consultar_api deve preencher a variável 'resposta' com a resposta JSON.
+        // Aqui estamos apenas simulando a resposta. Exemplo de resposta:
+        snprintf(resposta, sizeof(resposta), "{\"nome\": \"Flor Encantada\", \"efeito\": \"Aumenta a velocidade de movimento\"}");
+
+        // Parse a resposta JSON para extrair o nome e efeito.
+        sscanf(resposta, "{\"nome\": \"%[^\"]\", \"efeito\": \"%[^\"]\"}", nome, efeito);
+
+        return 0;  // Sucesso
+    }
+
+    return 1;  // Erro ao consultar a API
+}
+
+// Função para plantar uma nova planta usando a API
+void plantar(Fila* fila) {
+    char nome[50];
+    char efeito[100];
     int dias = rand() % 5 + 1;
     int valor = rand() % 100 + 1;
 
-    Planta* nova = criarPlanta(nome, efeito, dias, valor);
+    // Consultar a API para obter o nome e o efeito mágico da planta
+    if (consultar_nome_efeito_planta(nome, efeito) == 0) {
+        Planta* nova = criarPlanta(nome, efeito, dias, valor);
 
-    if (fila->fim == NULL) {
-        fila->inicio = fila->fim = nova;
+        // Adicionar a nova planta à fila
+        if (fila->fim == NULL) {
+            fila->inicio = fila->fim = nova;
+        } else {
+            fila->fim->prox = nova;
+            fila->fim = nova;
+        }
+
+        printf("🌱 Planta '%s' com efeito '%s' adicionada à fila!\n", nome, efeito);
     } else {
-        fila->fim->prox = nova;
-        fila->fim = nova;
+        printf("Erro ao consultar a API para obter o nome e o efeito da planta.\n");
     }
-
-    printf("🌱 Planta '%s' adicionada à fila!\n", nome);
 }
 
 void listarPlantas(Fila fila) {
@@ -75,7 +96,7 @@ void avancarDia(Fila* fila) {
     printf("🌞 Um dia se passou. As plantas cresceram!\n");
 }
 
-// Função para ordenar a fila de plantas por valor  mágico usando Insertion Sort
+// Função para ordenar a fila de plantas por valor mágico usando Insertion Sort
 void insertionSort(Fila* fila) {
     Planta* sorted = NULL;
     Planta* atual = fila->inicio;
@@ -106,7 +127,6 @@ void insertionSort(Fila* fila) {
         fila->fim = fila->fim->prox;
     }
 }
-
 
 void colher(Fila* fila) {
     int colheuAlguma = 0;
@@ -146,7 +166,6 @@ void liberarFila(Fila* fila) {
     }
     fila->inicio = fila->fim = NULL;
 }
-
 
 void menu() {
     printf("\n=== Agricultura Mágica ===\n");
