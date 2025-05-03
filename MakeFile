@@ -1,0 +1,24 @@
+# Compilador
+CC = gcc
+
+# Arquivo de saída
+OUT = app
+
+# Arquivo-fonte
+SRC = src/main.c
+
+# Flags do libcurl (usando pkg-config)
+CFLAGS = $(shell pkg-config --cflags libcurl)
+LDFLAGS = $(shell pkg-config --libs libcurl)
+
+# Regra padrão
+all:
+	$(CC) $(SRC) -o $(OUT) $(CFLAGS) $(LDFLAGS)
+
+# Executa o programa após compilar
+run: all
+	./$(OUT)
+
+# Limpa o binário
+clean:
+	rm -f $(OUT)
