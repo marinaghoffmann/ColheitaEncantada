@@ -9,3 +9,6 @@
   <li>
     <a href="https://github.com/lavasilva">Lavínia Maranhão </a> 
   </li>
+  <li>
+    <a href="https://github.com/JoaoRafael04">João Rafael Andrade </a> 
+  </li>
