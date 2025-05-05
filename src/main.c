@@ -24,7 +24,7 @@ Planta* criarPlanta(const char* nome, const char* efeito, int dias, int valor) {
 
 // Função para consultar a API e obter nome e efeito da planta
 int consultar_nome_efeito_planta(char* nome, char* efeito) {
-    const char* api_key = "sua_api_key_aqui";  // Substitua pela sua chave de API
+    const char* api_key = "AIzaSyA7Yk1N9BicMj7oUZE2sAj9Xj91WAQtrqo";  // Substitua pela sua chave de API
     const char* prompt_text = "Gerar um nome e efeito mágico para uma planta.";
 
     // Aqui estamos assumindo que a API irá retornar um JSON com "nome" e "efeito".
