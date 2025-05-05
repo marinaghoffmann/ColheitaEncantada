@@ -31,7 +31,7 @@ Navegue até a pasta do projeto:  "cd ColheitaEncantada"
 
 Compile com o make:  "make"
 
-Rode o executável:  "./app"
+Rode o executável:  "make run"
 
 
 ## 👩‍💻 Membros & Perfis do GitHub
