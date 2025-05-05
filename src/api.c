@@ -30,85 +30,71 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
     return realsize;
 }
 
-// Função que consulta a API Gemini e retorna a resposta
-int consultar_api(const char *api_key, const char *prompt_text) {
+int consultar_api(const char *api_key, const char *prompt_text, char *resposta, size_t tamanho_resposta) {
     CURL *curl_handle;
     CURLcode res;
     MemoryStruct chunk;
 
-    // Inicializa o buffer de memória para a resposta
-    chunk.buffer = malloc(1); // Começa com 1 byte (para o terminador nulo inicial)
+    chunk.buffer = malloc(1);  // Inicialmente vazio
     if (chunk.buffer == NULL) {
         fprintf(stderr, "Erro: Falha ao alocar memória inicial.\n");
         return 1;
     }
-    chunk.size = 0;    // Nenhum dado ainda
+    chunk.size = 0;
 
-    // Defina o modelo e o endpoint
-    const char *model = "gemini-1.5-flash-latest"; // Ou "gemini-pro", etc.
+    const char *model = "gemini-1.5-flash-latest";
     char api_url[512];
     snprintf(api_url, sizeof(api_url),
              "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s",
              model, api_key);
 
-    // Monte o corpo da requisição JSON
     char json_payload[1024];
     snprintf(json_payload, sizeof(json_payload),
              "{\"contents\":[{\"parts\":[{\"text\":\"%s\"}]}]}",
              prompt_text);
 
-    // Inicialização global da libcurl
     curl_global_init(CURL_GLOBAL_ALL);
-
-    // Inicializa o handle easy
     curl_handle = curl_easy_init();
 
-    if (curl_handle) {
-        // Configura a URL da API (já inclui a API Key)
-        curl_easy_setopt(curl_handle, CURLOPT_URL, api_url);
-
-        // Configura para ser uma requisição POST
-        curl_easy_setopt(curl_handle, CURLOPT_POST, 1L);
-
-        // Define o corpo (payload) da requisição POST (nosso JSON)
-        curl_easy_setopt(curl_handle, CURLOPT_POSTFIELDS, json_payload);
-
-        // Define o cabeçalho Content-Type
-        struct curl_slist *headers = NULL;
-        headers = curl_slist_append(headers, "Content-Type: application/json; charset=UTF-8");
-        curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER, headers);
-
-        // Define a função de callback para receber a resposta
-        curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-
-        // Passa nossa estrutura 'chunk' para a função de callback
-        curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&chunk);
-
-        // Executa a requisição
-        res = curl_easy_perform(curl_handle);
-
-        // Verifica erros na execução
-        if (res != CURLE_OK) {
-            fprintf(stderr, "curl_easy_perform() falhou: %s\n", curl_easy_strerror(res));
-        } else {
-            // Requisição bem-sucedida
-            long http_code = 0;
-            curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &http_code);
-            printf("Código de Status HTTP: %ld\n", http_code);
-
-            // Exibe a resposta completa
-            printf("Resposta JSON completa:\n%s\n", chunk.buffer);
-        }
-
-        // Limpeza
-        curl_easy_cleanup(curl_handle);
-        free(chunk.buffer); // Libera a memória alocada para a resposta
-        curl_slist_free_all(headers); // Libera a lista de cabeçalhos
-    } else {
+    if (!curl_handle) {
         fprintf(stderr, "Erro ao inicializar o handle da libcurl.\n");
+        free(chunk.buffer);
+        curl_global_cleanup();
+        return 1;
     }
 
-    // Limpeza global da libcurl
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(headers, "Content-Type: application/json; charset=UTF-8");
+
+    curl_easy_setopt(curl_handle, CURLOPT_URL, api_url);
+    curl_easy_setopt(curl_handle, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl_handle, CURLOPT_POSTFIELDS, json_payload);
+    curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&chunk);
+
+    res = curl_easy_perform(curl_handle);
+
+    long http_code = 0;
+    curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &http_code);
+
+    if (res != CURLE_OK || http_code != 200) {
+        fprintf(stderr, "Erro na requisição: %s\n", curl_easy_strerror(res));
+        free(chunk.buffer);
+        curl_easy_cleanup(curl_handle);
+        curl_slist_free_all(headers);
+        curl_global_cleanup();
+        return 1;
+    }
+
+    // Copia a resposta para o buffer fornecido pelo chamador
+    strncpy(resposta, chunk.buffer, tamanho_resposta - 1);
+    resposta[tamanho_resposta - 1] = '\0';  // Garante terminação nula
+
+    // Limpeza
+    free(chunk.buffer);
+    curl_easy_cleanup(curl_handle);
+    curl_slist_free_all(headers);
     curl_global_cleanup();
 
     return 0;

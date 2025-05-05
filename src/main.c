@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/api.h" 
+#include "/opt/homebrew/Cellar/cjson/1.7.18/include/cjson/cJSON.h"
+
+
 
 void inicializarFila(Fila* fila) {
     fila->inicio = NULL;
@@ -22,28 +25,70 @@ Planta* criarPlanta(const char* nome, const char* efeito, int dias, int valor) {
     return nova;
 }
 
-// Função para consultar a API e obter nome e efeito da planta
 int consultar_nome_efeito_planta(char* nome, char* efeito) {
-    const char* api_key = "AIzaSyA7Yk1N9BicMj7oUZE2sAj9Xj91WAQtrqo";  // Substitua pela sua chave de API
-    const char* prompt_text = "Gerar um nome e efeito mágico para uma planta.";
+    const char* api_key = "AIzaSyA7Yk1N9BicMj7oUZE2sAj9Xj91WAQtrqo";
+    const char* prompt_text = "Gere o nome e o efeito mágico de uma planta no seguinte formato:\n**Nome:** <nome>\n**Efeito Mágico:** <efeito>";
 
-    // Aqui estamos assumindo que a API irá retornar um JSON com "nome" e "efeito".
-    // Você precisará de um parser de JSON para extrair essas informações da resposta.
-    char resposta[1024];
+    char resposta[1024];  // ou outro tamanho adequado
+    size_t tamanho_resposta = sizeof(resposta);
 
-    if (consultar_api(api_key, prompt_text) == 0) {
-        // A função consultar_api deve preencher a variável 'resposta' com a resposta JSON.
-        // Aqui estamos apenas simulando a resposta. Exemplo de resposta:
-        snprintf(resposta, sizeof(resposta), "{\"nome\": \"Flor Encantada\", \"efeito\": \"Aumenta a velocidade de movimento\"}");
-
-        // Parse a resposta JSON para extrair o nome e efeito.
-        sscanf(resposta, "{\"nome\": \"%[^\"]\", \"efeito\": \"%[^\"]\"}", nome, efeito);
-
-        return 0;  // Sucesso
+    int resultado = consultar_api(api_key, prompt_text, resposta, tamanho_resposta);
+    if (resultado != 0) {
+        fprintf(stderr, "Erro ao consultar a API.\n");
+        return 1;
     }
 
-    return 1;  // Erro ao consultar a API
+    // Parse JSON com cJSON
+    cJSON* root = cJSON_Parse(resposta);
+    if (!root) {
+        fprintf(stderr, "Erro ao parsear JSON.\n");
+        return 1;
+    }
+
+    // Caminho: candidates[0].content.parts[0].text
+    cJSON* candidates = cJSON_GetObjectItem(root, "candidates");
+    if (!cJSON_IsArray(candidates)) goto erro;
+
+    cJSON* cand0 = cJSON_GetArrayItem(candidates, 0);
+    cJSON* content = cJSON_GetObjectItem(cand0, "content");
+    cJSON* parts = cJSON_GetObjectItem(content, "parts");
+    cJSON* part0 = cJSON_GetArrayItem(parts, 0);
+    cJSON* text = cJSON_GetObjectItem(part0, "text");
+
+    if (!cJSON_IsString(text)) goto erro;
+
+    // Exemplo de resposta: "**Nome:** Rosa Solar\n**Efeito Mágico:** Cura ferimentos leves"
+    const char* texto = text->valuestring;
+
+    // Extrair nome e efeito
+    char* pos_nome = strstr(texto, "**Nome:**");
+    char* pos_efeito = strstr(texto, "**Efeito Mágico:**");
+
+    if (!pos_nome || !pos_efeito) goto erro;
+
+    pos_nome += strlen("**Nome:**");
+    pos_efeito += strlen("**Efeito Mágico:**");
+
+    // Remove possíveis quebras de linha ou espaços extras
+    while (*pos_nome == ' ' || *pos_nome == '\n') pos_nome++;
+    while (*pos_efeito == ' ' || *pos_efeito == '\n') pos_efeito++;
+
+    // Copia o nome e efeito para os parâmetros
+    int len_nome = pos_efeito - strlen("**Efeito Mágico:**") - pos_nome;
+    strncpy(nome, pos_nome, len_nome);
+    nome[len_nome] = '\0';
+    strncpy(efeito, pos_efeito, 100);
+    efeito[99] = '\0';
+
+    cJSON_Delete(root);
+    return 0;
+
+erro:
+    fprintf(stderr, "Erro ao extrair dados da resposta JSON.\n");
+    cJSON_Delete(root);
+    return 1;
 }
+
 
 // Função para plantar uma nova planta usando a API
 void plantar(Fila* fila) {
