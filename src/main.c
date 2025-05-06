@@ -26,7 +26,7 @@ Planta* criarPlanta(const char* nome, const char* efeito, int dias, int valor) {
 }
 
 int consultar_nome_efeito_planta(char* nome, char* efeito) {
-    const char* api_key = "AIzaSyA7Yk1N9BicMj7oUZE2sAj9Xj91WAQtrqo";
+    const char* api_key = "AIzaSyC4MOaYgdeYs-NHQ4ysvZd4GbdfMizqDTI";
     const char* prompt_text = "Gere o nome e o efeito mágico de uma planta no seguinte formato:\n**Nome:** <nome>\n**Efeito Mágico:** <efeito>";
 
     char resposta[1024];  // ou outro tamanho adequado
