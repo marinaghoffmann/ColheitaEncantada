@@ -2,8 +2,10 @@
 #define JOGO_H
 
 #include "planta.h"
-#include "objetivo.h"
+#include "item_magico.h"
 
-int verificarObjetivo(Fila *colhidas, const Objetivo *objetivo);
+void avancarDia(Fila *fila);
+void colher(Fila *fila);
+void usarItemMagico(Fila *fila);
 
 #endif

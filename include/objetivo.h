@@ -7,7 +7,6 @@ typedef struct {
     const char *descricao;
 } Objetivo;
 
-// Lista de combinações possíveis
 extern const Objetivo objetivos[];
 
 #define NUM_OBJETIVOS 10

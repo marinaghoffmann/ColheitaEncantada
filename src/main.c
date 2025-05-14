@@ -1,5 +1,5 @@
 #include "../include/planta.h"
-#include "../include/jogo.h" // Inclua o cabeçalho de jogo
+#include "../include/jogo.h" 
 #include "../include/menu.h"
 #include "../include/api.h"
 #include "../include/objetivo.h"
@@ -22,8 +22,7 @@ int main() {
     inicializarFila(&fila);
     int opcao;
 
-    // Sorteio do objetivo
-    srand(time(NULL)); // Inicializa o gerador de números aleatórios
+    srand(time(NULL)); 
     int indice_objetivo = rand() % NUM_OBJETIVOS;
     const Objetivo *objetivo_atual = &objetivos[indice_objetivo];
 
@@ -33,7 +32,7 @@ int main() {
     do {
         menu();
         scanf("%d", &opcao);
-        getchar(); // limpar buffer
+        getchar(); 
 
         switch (opcao) {
             case 1: {
@@ -42,7 +41,7 @@ int main() {
                     char nome[100], efeito[300], necessidades[300];
                     sscanf(resposta, "%99[^|]|%299[^|]|%299[^\n]", nome, efeito, necessidades);
 
-                    int dias_para_colher = 5 + rand() % 5; // Entre 5 e 9 dias
+                    int dias_para_colher = 5 + rand() % 5; 
 
                     Planta* nova = criarPlanta(nome, efeito, necessidades, dias_para_colher);
                     if (nova != NULL) {

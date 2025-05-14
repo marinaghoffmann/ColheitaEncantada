@@ -6,7 +6,7 @@
 typedef struct Planta {
     char nome[100];
     char efeito[300];
-    char necessidades[300]; // Adicione o campo "necessidades"
+    char necessidades[300]; 
     int dias_para_colher;
     struct Planta* prox;
 } Planta;

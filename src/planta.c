@@ -16,7 +16,7 @@ Planta* criarPlanta(const char* nome, const char* efeito, const char* necessidad
     }
     strcpy(nova->nome, nome);
     strcpy(nova->efeito, efeito);
-    strcpy(nova->necessidades, necessidades); // Adicionado
+    strcpy(nova->necessidades, necessidades); 
     nova->dias_para_colher = dias;
     nova->prox = NULL;
     return nova;

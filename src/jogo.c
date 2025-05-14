@@ -1,9 +1,11 @@
 #include "../include/jogo.h"
 #include "../include/planta.h"
 #include "../include/objetivo.h"
+#include "../include/item_magico.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 void avancarDia(Fila* fila) {
     Planta* atual = fila->inicio;
@@ -21,7 +23,7 @@ void colher(Fila* fila) {
 
     while (fila->inicio != NULL && fila->inicio->dias_para_colher == 0) {
         Planta* colhida = fila->inicio;
-        printf("🧺 Colhendo planta: %s\n", colhida->nome); // Removido o campo "valor"
+        printf("🧺 Colhendo planta: %s\n", colhida->nome); 
         fila->inicio = fila->inicio->prox;
         free(colhida);
         colheuAlguma = 1;
@@ -58,4 +60,45 @@ int verificarObjetivo(Fila *colhidas, const Objetivo *objetivo) {
     }
 
     return encontrou_primeira && encontrou_segunda;
+}
+
+void usarItemMagico(Fila *fila) {
+    srand(time(NULL));
+    int indice_item = rand() % NUM_ITENS_MAGICOS;
+    const ItemMagico *item = &itens_magicos[indice_item];
+
+    printf("✨ Item mágico disponível: %s\n", item->nome);
+    printf("📜 Descrição: %s\n", item->descricao);
+    printf("Deseja usar este item? (s/n): ");
+    char escolha;
+    scanf(" %c", &escolha);
+
+    if (escolha == 's' || escolha == 'S') {
+        Planta *atual = fila->inicio;
+        int afetouAlguma = 0;
+
+        while (atual != NULL) {
+            int impacto = item->efeito * item->impacto;
+            atual->dias_para_colher += impacto;
+
+            if (atual->dias_para_colher < 0) {
+                atual->dias_para_colher = 0;
+            }
+
+            if (impacto > 0) {
+                printf("🌟 O item %s acelerou a planta '%s' em %d dia(s)!\n", item->nome, atual->nome, impacto);
+            } else if (impacto < 0) {
+                printf("⚠️ O item %s prejudicou a planta '%s', atrasando-a em %d dia(s)!\n", item->nome, atual->nome, -impacto);
+            }
+
+            atual = atual->prox;
+            afetouAlguma = 1;
+        }
+
+        if (!afetouAlguma) {
+            printf("🌱 Nenhuma planta foi afetada pelo item mágico.\n");
+        }
+    } else {
+        printf("🔮 Você decidiu não usar o item mágico.\n");
+    }
 }
