@@ -1,0 +1,38 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g3",
+      "-Iinclude",
+      "-I/opt/homebrew/Cellar/cjson/1.7.18/include/cjson",
+      "-I/usr/include/x86_64-linux-gnu",
+      "-c",
+      "-o",
+      "obj/main.o",
+      "src/main.c"
+    ],
+    "directory": "/mnt/c/Users/Lavinia Silva/Desktop/vscode/colheita/ColheitaEncantada",
+    "file": "/mnt/c/Users/Lavinia Silva/Desktop/vscode/colheita/ColheitaEncantada/src/main.c",
+    "output": "/mnt/c/Users/Lavinia Silva/Desktop/vscode/colheita/ColheitaEncantada/obj/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-g3",
+      "-Iinclude",
+      "-I/opt/homebrew/Cellar/cjson/1.7.18/include/cjson",
+      "-I/usr/include/x86_64-linux-gnu",
+      "-c",
+      "-o",
+      "obj/planta.o",
+      "src/planta.c"
+    ],
+    "directory": "/mnt/c/Users/Lavinia Silva/Desktop/vscode/colheita/ColheitaEncantada",
+    "file": "/mnt/c/Users/Lavinia Silva/Desktop/vscode/colheita/ColheitaEncantada/src/planta.c",
+    "output": "/mnt/c/Users/Lavinia Silva/Desktop/vscode/colheita/ColheitaEncantada/obj/planta.o"
+  }
+]
