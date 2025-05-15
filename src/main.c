@@ -69,7 +69,7 @@ int main() {
                 break;
             }
             case 2:
-                ordenarPlantasPorColheita(&fila); // Ordena as plantas antes de listar
+                ordenarPlantasPorColheita(&fila); 
                 listarPlantas(fila);
                 break;
             case 3:
@@ -86,9 +86,9 @@ int main() {
                 }
                 break;
             case 4: {
-                Planta* colhida = dequeue(&fila); // Usar a função dequeue
+                Planta* colhida = dequeue(&fila); 
                 if (colhida != NULL) {
-                    enqueue(&colhidas, colhida); // Adicionar à fila de colhidas
+                    enqueue(&colhidas, colhida); 
                     printf("\n\n🌾 Planta '%s' foi colhida com sucesso!\n", colhida->nome);
                 } else {
                     printf("❌ Não há plantas para colher.\n");

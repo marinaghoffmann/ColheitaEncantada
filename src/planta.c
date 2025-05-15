@@ -12,7 +12,7 @@ static int indice_efeito_atual = 0;
 int efeitoValido(const char *efeito) {
     for (int i = 0; i < NUM_EFEITOS; i++) {
         if (strcasecmp(efeito, efeitos_permitidos[i]) == 0) {
-            return 1; // Efeito válido
+            return 1; 
         }
     }
     return 0;
@@ -87,16 +87,15 @@ void liberarFila(Fila* fila) {
 
 void ordenarPlantasPorColheita(Fila* fila) {
     if (fila->inicio == NULL || fila->inicio->prox == NULL) {
-        return; // Nada para ordenar
+        return; 
     }
 
-    Planta* sorted = NULL; // Lista ordenada
+    Planta* sorted = NULL; 
     Planta* atual = fila->inicio;
 
     while (atual != NULL) {
         Planta* prox = atual->prox;
 
-        // Inserção ordenada na lista 'sorted'
         if (sorted == NULL || atual->dias_para_colher < sorted->dias_para_colher) {
             atual->prox = sorted;
             sorted = atual;
@@ -112,7 +111,7 @@ void ordenarPlantasPorColheita(Fila* fila) {
         atual = prox;
     }
 
-    fila->inicio = sorted; // Atualiza a fila com a lista ordenada
+    fila->inicio = sorted; 
 }
 
 void enqueue(Fila* fila, Planta* nova) {
@@ -127,12 +126,12 @@ void enqueue(Fila* fila, Planta* nova) {
 
 Planta* dequeue(Fila* fila) {
     if (fila->inicio == NULL) {
-        return NULL; // Fila vazia
+        return NULL; 
     }
     Planta* removida = fila->inicio;
     fila->inicio = fila->inicio->prox;
     if (fila->inicio == NULL) {
-        fila->fim = NULL; // Fila ficou vazia
+        fila->fim = NULL; 
     }
     return removida;
 }

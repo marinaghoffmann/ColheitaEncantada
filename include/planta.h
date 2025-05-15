@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Estruturas
 typedef struct Planta {
     char nome[100];
     char efeito[300];
@@ -22,8 +21,8 @@ typedef struct {
 // Funções
 void inicializarFila(Fila* fila);
 void liberarFila(Fila* fila);
-void enqueue(Fila* fila, Planta* nova); // Declaração de enqueue
-Planta* dequeue(Fila* fila);           // Declaração de dequeue
-void checarPlantasColhidas(Fila* colhidas); // Declaração de checarPlantasColhidas
+void enqueue(Fila* fila, Planta* nova); 
+Planta* dequeue(Fila* fila);      
+void checarPlantasColhidas(Fila* colhidas); 
 
 #endif

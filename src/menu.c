@@ -8,7 +8,7 @@ void menu() {
     printf("3. Avançar dia\n");
     printf("4. Colher planta\n");
     printf("5. Ver objetivo\n");
-    printf("6. Checar plantas colhidas\n"); // Nova opção
+    printf("6. Checar plantas colhidas\n"); 
     printf("0. Sair\n");
     printf("Escolha uma opção: ");
 }
