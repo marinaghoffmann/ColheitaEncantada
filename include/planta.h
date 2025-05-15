@@ -6,23 +6,23 @@
 #include <string.h>
 
 typedef struct Planta {
-    char nome[100];          
-    char efeito[300];        
-    char necessidades[300]; 
-    int dias_para_colher;    
-    struct Planta* prox;    
+    char nome[100];
+    char efeito[300];
+    char necessidades[300];
+    int dias_para_colher;
+    struct Planta* prox;
 } Planta;
 
 typedef struct {
-    Planta* inicio; 
-    Planta* fim;    
+    Planta* inicio;
+    Planta* fim;
 } Fila;
 
+// Funções
 void inicializarFila(Fila* fila);
-Planta* criarPlanta(const char* nome, const char* efeito, const char* necessidades, int dias);
-void listarPlantas(Fila fila);
 void liberarFila(Fila* fila);
-const char* escolherEfeitoRotativo();
-void ordenarPlantasPorColheita(Fila* fila);
+void enqueue(Fila* fila, Planta* nova); 
+Planta* dequeue(Fila* fila);      
+void checarPlantasColhidas(Fila* colhidas); 
 
 #endif
