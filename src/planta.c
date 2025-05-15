@@ -87,20 +87,20 @@ void liberarFila(Fila* fila) {
 
 void ordenarPlantasPorColheita(Fila* fila) {
     if (fila->inicio == NULL || fila->inicio->prox == NULL) {
-        return; // Nada para ordenar
+        return;
     }
 
-    Planta* sorted = NULL; // Lista ordenada
+    Planta* sorted = NULL; 
     Planta* atual = fila->inicio;
 
     while (atual != NULL) {
-        Planta* prox = atual->prox;
-
-        // Inserção ordenada na lista 'sorted'
+        Planta* prox = atual->prox; 
         if (sorted == NULL || atual->dias_para_colher < sorted->dias_para_colher) {
+            
             atual->prox = sorted;
             sorted = atual;
         } else {
+            
             Planta* temp = sorted;
             while (temp->prox != NULL && temp->prox->dias_para_colher <= atual->dias_para_colher) {
                 temp = temp->prox;
@@ -108,48 +108,8 @@ void ordenarPlantasPorColheita(Fila* fila) {
             atual->prox = temp->prox;
             temp->prox = atual;
         }
-
-        atual = prox;
+        atual = prox; 
     }
 
-    fila->inicio = sorted; // Atualiza a fila com a lista ordenada
-}
-
-void enqueue(Fila* fila, Planta* nova) {
-    if (fila->fim == NULL) {
-        fila->inicio = fila->fim = nova;
-    } else {
-        fila->fim->prox = nova;
-        fila->fim = nova;
-    }
-    nova->prox = NULL;
-}
-
-Planta* dequeue(Fila* fila) {
-    if (fila->inicio == NULL) {
-        return NULL; // Fila vazia
-    }
-    Planta* removida = fila->inicio;
-    fila->inicio = fila->inicio->prox;
-    if (fila->inicio == NULL) {
-        fila->fim = NULL; // Fila ficou vazia
-    }
-    return removida;
-}
-
-void checarPlantasColhidas(Fila* colhidas) {
-    if (colhidas->inicio == NULL) {
-        printf("❌ Nenhuma planta foi colhida ainda.\n");
-        return;
-    }
-
-    printf("\n\n🌾 Plantas colhidas:\n");
-    Planta* atual = colhidas->inicio;
-    while (atual != NULL) {
-        printf("🌱 Nome: %s\n", atual->nome);
-        printf("✨ Efeito: %s\n", atual->efeito);
-        printf("🌿 Necessidades: %s\n", atual->necessidades);
-        printf("📅 Tempo para colher: %d dias\n\n", atual->dias_para_colher);
-        atual = atual->prox;
-    }
+    fila->inicio = sorted; 
 }
