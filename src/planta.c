@@ -57,7 +57,9 @@ Planta* criarPlanta(const char* nome, const char* efeito, const char* necessidad
 }
 
 void listarPlantas(Fila fila) {
-    printf("📋 Plantas na fila \n\n");
+    printf("📋 Plantas na fila (ordem crescente de tempo de colheita):\n\n");
+
+    ordenarPlantasPorColheita(&fila); 
 
     Planta* atual = fila.inicio;
     if (atual == NULL) {
@@ -71,7 +73,6 @@ void listarPlantas(Fila fila) {
             atual = atual->prox;
         }
     }
-
 }
 
 void liberarFila(Fila* fila) {
@@ -82,4 +83,33 @@ void liberarFila(Fila* fila) {
         free(temp);
     }
     fila->inicio = fila->fim = NULL;
+}
+
+void ordenarPlantasPorColheita(Fila* fila) {
+    if (fila->inicio == NULL || fila->inicio->prox == NULL) {
+        return;
+    }
+
+    Planta* sorted = NULL; 
+    Planta* atual = fila->inicio;
+
+    while (atual != NULL) {
+        Planta* prox = atual->prox; 
+        if (sorted == NULL || atual->dias_para_colher < sorted->dias_para_colher) {
+            
+            atual->prox = sorted;
+            sorted = atual;
+        } else {
+            
+            Planta* temp = sorted;
+            while (temp->prox != NULL && temp->prox->dias_para_colher <= atual->dias_para_colher) {
+                temp = temp->prox;
+            }
+            atual->prox = temp->prox;
+            temp->prox = atual;
+        }
+        atual = prox; 
+    }
+
+    fila->inicio = sorted; 
 }
