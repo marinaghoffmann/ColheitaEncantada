@@ -23,5 +23,6 @@ Planta* criarPlanta(const char* nome, const char* efeito, const char* necessidad
 void listarPlantas(Fila fila);
 void liberarFila(Fila* fila);
 const char* escolherEfeitoRotativo();
+void ordenarPlantasPorColheita(Fila* fila);
 
 #endif

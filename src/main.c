@@ -58,7 +58,7 @@ int main() {
                                 fila.fim->prox = nova;
                                 fila.fim = nova;
                             }
-                            printf("\n\n 🌱 Planta '%s' adicionada à fila com sucesso!\n", nome);
+                            printf("\n\n🌱 Planta '%s' adicionada à fila com sucesso!\n", nome);
                             printf("✨ Efeito: %s\n", descricao_efeito);
                             printf("🌿 Necessidades: %s\n", necessidades);
                             printf("📅 Tempo para colher: %d dias\n", dias_para_colher);
