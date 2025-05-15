@@ -2,12 +2,13 @@
 #include <stdio.h>
 
 void menu() {
-    printf("\n🔮 Menu Místico da Colheita Encantada 🔮\n\n");
-    printf("1. Plantar nova semente\n");
+    printf("\n\n=== Menu ===\n");
+    printf("1. Adicionar planta\n");
     printf("2. Listar plantas\n");
-    printf("3. Avançar um dia\n");
-    printf("4. Colher plantas prontas\n");
-    printf("5. Rever missão da partida\n"); 
+    printf("3. Avançar dia\n");
+    printf("4. Colher planta\n");
+    printf("5. Ver objetivo\n");
+    printf("6. Checar plantas colhidas\n"); // Nova opção
     printf("0. Sair\n");
-    printf("Escolha: ");
+    printf("Escolha uma opção: ");
 }

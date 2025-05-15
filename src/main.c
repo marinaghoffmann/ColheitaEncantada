@@ -47,19 +47,14 @@ int main() {
                          efeito_escolhido);
 
                 if (consultar_api(prompt_text, resposta, sizeof(resposta)) == 0) {
-                    char nome[100], descricao_efeito[300], necessidades[300];
-                    if (sscanf(resposta, "%99[^|]|%299[^|]|%299[^\n]", nome, descricao_efeito, necessidades) == 3) {
+                    char nome[100], efeito[300], necessidades[300];
+                    if (sscanf(resposta, "%99[^|]|%299[^|]|%299[^\n]", nome, efeito, necessidades) == 3) {
                         int dias_para_colher = 9 + rand() % 4; 
-                        Planta* nova = criarPlanta(nome, descricao_efeito, necessidades, dias_para_colher);
+                        Planta* nova = criarPlanta(nome, efeito, necessidades, dias_para_colher);
                         if (nova != NULL) {
-                            if (fila.fim == NULL) {
-                                fila.inicio = fila.fim = nova;
-                            } else {
-                                fila.fim->prox = nova;
-                                fila.fim = nova;
-                            }
+                            enqueue(&fila, nova); // Usar a função enqueue
                             printf("\n\n🌱 Planta '%s' adicionada à fila com sucesso!\n", nome);
-                            printf("✨ Efeito: %s\n", descricao_efeito);
+                            printf("✨ Efeito: %s\n", efeito);
                             printf("🌿 Necessidades: %s\n", necessidades);
                             printf("📅 Tempo para colher: %d dias\n", dias_para_colher);
                         } else {
@@ -74,6 +69,7 @@ int main() {
                 break;
             }
             case 2:
+                ordenarPlantasPorColheita(&fila); // Ordena as plantas antes de listar
                 listarPlantas(fila);
                 break;
             case 3:
@@ -89,12 +85,22 @@ int main() {
                     opcao = 0; 
                 }
                 break;
-            case 4:
-                colher(&fila);
+            case 4: {
+                Planta* colhida = dequeue(&fila); // Usar a função dequeue
+                if (colhida != NULL) {
+                    enqueue(&colhidas, colhida); // Adicionar à fila de colhidas
+                    printf("\n\n🌾 Planta '%s' foi colhida com sucesso!\n", colhida->nome);
+                } else {
+                    printf("❌ Não há plantas para colher.\n");
+                }
                 break;
+            }
             case 5:
                 printf("\n\n📜 Enigma da Missão: '%s'\n\n", objetivo_atual->descricao);
                 printf("🎯 Objetivo da Missão: Colher plantas com o efeito de %s e de %s! \n", objetivo_atual->nome1, objetivo_atual->nome2);
+                break;
+            case 6:
+                checarPlantasColhidas(&colhidas);
                 break;
             case 0:
                 if (verificarObjetivo(&fila, objetivo_atual)) {
