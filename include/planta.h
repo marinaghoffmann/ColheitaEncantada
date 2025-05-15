@@ -5,25 +5,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Estruturas
 typedef struct Planta {
-    char nome[100];
-    char efeito[300];
-    char necessidades[300];
-    int dias_para_colher;
-    struct Planta* prox;
+    char nome[100];          
+    char efeito[300];        
+    char necessidades[300]; 
+    int dias_para_colher;    
+    struct Planta* prox;    
 } Planta;
 
 typedef struct {
-    Planta* inicio;
-    Planta* fim;
+    Planta* inicio; 
+    Planta* fim;    
 } Fila;
 
-// Funções
 void inicializarFila(Fila* fila);
+Planta* criarPlanta(const char* nome, const char* efeito, const char* necessidades, int dias);
+void listarPlantas(Fila fila);
 void liberarFila(Fila* fila);
-void enqueue(Fila* fila, Planta* nova); // Declaração de enqueue
-Planta* dequeue(Fila* fila);           // Declaração de dequeue
-void checarPlantasColhidas(Fila* colhidas); // Declaração de checarPlantasColhidas
+const char* escolherEfeitoRotativo();
+void ordenarPlantasPorColheita(Fila* fila);
 
 #endif
