@@ -7,9 +7,13 @@ OUT = app
 # Diretórios
 SRC_DIR = src
 INC_DIR = include
+OBJ_DIR = obj
 
 # Arquivos-fonte
-SRC = $(SRC_DIR)/main.c $(SRC_DIR)/api.c
+SRC = $(wildcard $(SRC_DIR)/*.c)
+
+# Arquivos-objeto
+OBJ = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
 
 # Flags de compilação
 CFLAGS = -Wall -Wextra -g3 -I$(INC_DIR) -I/opt/homebrew/Cellar/cjson/1.7.18/include/cjson $(shell pkg-config --cflags libcurl)
@@ -20,11 +24,19 @@ LDFLAGS = -L/opt/homebrew/Cellar/cjson/1.7.18/lib -lcjson $(shell pkg-config --l
 # Regra padrão
 all: $(OUT)
 
-$(OUT): $(SRC)
-	$(CC) $(SRC) -o $(OUT) $(CFLAGS) $(LDFLAGS)
+# Regra para criar o executável
+$(OUT): $(OBJ)
+	$(CC) $^ -o $@ $(LDFLAGS)
 
-run: all
+# Regra para compilar os arquivos-objeto
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Regra para executar o programa
+run: $(OUT)
 	./$(OUT)
 
+# Limpeza
 clean:
-	rm -f $(OUT) $(SRC_DIR)/*.o
+	rm -rf $(OUT) $(OBJ_DIR)
