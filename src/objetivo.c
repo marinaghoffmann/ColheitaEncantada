@@ -5,7 +5,7 @@ const Objetivo objetivos[NUM_OBJETIVOS] = {
      "Nas brumas do destino, tua visão alcança o futuro. Mas, antes que o caminho se revele, "
      "a colheita encantada trará a cura para o ferimento de teu familiar, para que o destino não seja selado pela dor."},
 
-    {"Cura", "Desenvenenamento", 
+    {"Cura", "Neutralizar Venenos", 
      "O veneno percorre as veias, mas o toque da cura é mais forte. Nas sombras da noite, onde o veneno espreita, "
      "invocamos o antídoto, para que a vida se recupere e o mal se dissipe."},
 
@@ -17,7 +17,7 @@ const Objetivo objetivos[NUM_OBJETIVOS] = {
      "A cura repousa no toque, mas a energia que falta deve ser restaurada. Invoca o poder das fontes mágicas, "
      "para que o vigor do teu aliado seja restaurado, e a recuperação seja mais rápida que o vento."},
 
-    {"Clarividência", "Envenenamento", 
+    {"Clarividência", "Neutralizar Venenos", 
      "Teus olhos podem ver o que está oculto, e nas visões que surgem, o veneno te aguarda. Com clareza, verás onde atacar, "
      "e o antídoto será revelado na corrente do tempo."},
 
@@ -29,11 +29,11 @@ const Objetivo objetivos[NUM_OBJETIVOS] = {
      "A visão do futuro se mistura com o presente, e o que está por vir é claro, mas o que falta é a força para resistir. "
      "Dê ao teu aliado o vigor necessário, enquanto as estrelas revelam o caminho certo."},
 
-    {"Envenenamento", "Proteção", 
+    {"Neutralizar Venenos", "Proteção", 
      "O veneno está no ar, buscando seu alvo, mas não passarás desprotegido. Um escudo de pura luz se erguirá, "
      "neutralizando o mal que ameaça. Que a proteção da magia envolva teu companheiro."},
 
-    {"Envenenamento", "Energia", 
+    {"Neutralizar Venenos", "Energia", 
      "O veneno ameaça consumir a vitalidade de teu aliado. Mas em suas veias, o poder da energia será trazido, "
      "e o antídoto à força da vida restaurará o que o veneno deseja corromper."},
 

@@ -7,11 +7,13 @@
 #include <string.h>
 #include <time.h>
 
-void avancarDia(Fila* fila) {
-    Planta* atual = fila->inicio;
+void avancarDia(Fila *fila) {
+    usarItemMagico(fila); 
+
+    Planta *atual = fila->inicio;
     while (atual != NULL) {
         if (atual->dias_para_colher > 0) {
-            atual->dias_para_colher--;
+            atual->dias_para_colher--; 
         }
         atual = atual->prox;
     }

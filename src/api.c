@@ -130,10 +130,9 @@ int consultar_api(const char *prompt_text, char *resposta, size_t tamanho_respos
         return 1;
     }
 
-    // Exibir a resposta da API
-    printf("Resposta da API: %s\n", chunk.buffer);
+    // guardando pra caso a api dê bronca de novo: tirar do comentário pra ver resposta exata da api
+    // printf("Resposta da API: %s\n", chunk.buffer);
 
-    // Processar a resposta JSON
     cJSON *json = cJSON_Parse(chunk.buffer);
     if (!json) {
         fprintf(stderr, "Erro ao analisar o JSON retornado pela API.\n");
@@ -143,7 +142,6 @@ int consultar_api(const char *prompt_text, char *resposta, size_t tamanho_respos
         return 1;
     }
 
-    // Navegar até "candidates[0].content.parts[0].text"
     cJSON *candidates = cJSON_GetObjectItemCaseSensitive(json, "candidates");
     if (!cJSON_IsArray(candidates)) {
         fprintf(stderr, "Erro: Campo 'candidates' não encontrado ou não é um array.\n");
@@ -204,11 +202,9 @@ int consultar_api(const char *prompt_text, char *resposta, size_t tamanho_respos
         return 1;
     }
 
-    // Remover delimitadores Markdown do campo "text"
     char json_limpo[2048];
     limpar_delimitadores_markdown(text->valuestring, json_limpo, sizeof(json_limpo));
 
-    // O campo "json_limpo" contém o JSON formatado como string. Vamos analisá-lo.
     cJSON *inner_json = cJSON_Parse(json_limpo);
     if (!inner_json) {
         fprintf(stderr, "Erro ao analisar o JSON interno em 'text'.\n");
