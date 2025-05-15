@@ -18,11 +18,18 @@ typedef struct {
     Planta* fim;
 } Fila;
 
-// Funções
+// nossas funções de manipulação da fila e plantas
 void inicializarFila(Fila* fila);
 void liberarFila(Fila* fila);
 void enqueue(Fila* fila, Planta* nova); 
 Planta* dequeue(Fila* fila);      
 void checarPlantasColhidas(Fila* colhidas); 
+
+// nossas funções de lógica do jogo/planta
+Planta* criarPlanta(const char* nome, const char* efeito, const char* necessidades, int dias);
+void listarPlantas(Fila fila);
+void ordenarPlantasPorColheita(Fila* fila);
+int efeitoValido(const char *efeito);
+const char* escolherEfeitoRotativo(void);
 
 #endif
