@@ -14,6 +14,8 @@
 #include <stdbool.h>
 #define Rectangle RayRectangle
 #define CloseWindow RayCloseWindow
+
+
 #define ShowCursor RayShowCursor
 #undef LoadImage
 #define LoadImage RayLoadImage
@@ -25,6 +27,7 @@
 
 
 #include "../raylib/include/raylib.h"
+
 
 typedef struct Botao {
     Rectangle rect;
@@ -40,8 +43,9 @@ const ItemMagico itens_magicos[NUM_ITENS_MAGICOS] = {
 };
 
 void plantarSemente(Fila *fila, char* texto1, char* texto2, char* texto3, char* texto4, bool* mostrar, double* tempoInicio);
-void processarAvancoDeDia(Fila *fila, const Objetivo *objetivo_atual, int *dias_restantes, int *opcao,
-                          char *mensagem1, char *mensagem2, bool *mostrarMensagem, double *tempoMensagem);
+void processarAvancoDeDia(Fila *fila, const Objetivo *objetivo_atual, int *dias_restantes,
+                          char *mensagem1, char *mensagem2, bool *mostrarMensagem, double *tempoMensagem,
+                          bool *jogoFinalizado, double *tempoFimJogo);
 void criarBotao (Botao *butao, Rectangle rect, Color color);
 void desenharBotao(Botao botao) {
     DrawRectangleRec(botao.rect, botao.color);
@@ -64,7 +68,7 @@ int main() {
     srand(time(NULL)); 
     int indice_objetivo = rand() % NUM_OBJETIVOS;
     const Objetivo *objetivo_atual = &objetivos[indice_objetivo];
-    int dias_restantes = 10;
+    int dias_restantes = 30;
     char textoPlantaSemente1[256], textoPlantaSemente2[256], textoPlantaSemente3[256], textoPlantaSemente4[256];
 
 
@@ -91,40 +95,52 @@ int main() {
     bool mostrarFimDia = false;
     double tempoFimDia = 0;
 
+    bool jogoFinalizado = false;
+    double tempoFimJogo = 0;
+
     InitWindow(screenWidth, screenHeight, "Colheita Mágica");
 
-    criarBotao(&botaoPlantarSemente, (Rectangle){ 10, 120, 200, 50 }, RED);
-    criarBotao(&botaoVisualizarPlantas, (Rectangle){ 10, 180, 200, 50 }, RED);
-    criarBotao(&botaoAvancarDia, (Rectangle){ 10, 240, 200, 50 }, RED);
-    criarBotao(&botaoColherPlantas, (Rectangle){ 10, 300, 200, 50 }, RED);
+    criarBotao(&botaoPlantarSemente, (Rectangle){ 10, 240, 400, 100 }, RED);//x,y, largura,altura
+    criarBotao(&botaoVisualizarPlantas, (Rectangle){ 10, 360, 400, 100 }, RED);
+    criarBotao(&botaoAvancarDia, (Rectangle){ 10, 480, 400, 100 }, RED);
+    criarBotao(&botaoColherPlantas, (Rectangle){ 10, 600, 400, 100 }, RED);
 
 
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
         BeginDrawing();
+        ClearBackground(RAYWHITE);
+
+        DrawRectangle(0, 0, 1600, 900, BLUE);            // céu
+        DrawRectangle(0, 600, 1600, 800, GREEN);        // chão
+
+        DrawRectangle(0, 0, 800, 80, Fade(BLACK, 0.4f));
+        DrawText(" Jogo das Plantas Mágicas", 20, 20, 30, RED);
+
+
 
         Vector2 mouse = GetMousePosition();
         char texto1[500], texto2[500], texto3[500];
 
         sprintf(texto1,"\n📅 Dias Restantes Na Missão: %d dias\n", dias_restantes);
-        DrawText(texto1, 10 , 0, 20, BLACK);
+        DrawText(texto1, 10 , 100, 20, BLACK);
         sprintf(texto2,"\n\n📜 Enigma da Missão: '%s'\n\n", objetivo_atual->descricao);
-        DrawText(texto2, 10, 50 ,12, BLACK);
+        DrawText(texto2, 10, 150 ,20, BLACK);
         sprintf(texto3,"🎯 Objetivo da Missão: Colher plantas com o efeito de %s e de %s! \n", objetivo_atual->nome1, objetivo_atual->nome2);
-        DrawText(texto3, 10, 100,12, BLACK);
+        DrawText(texto3, 10, 200,20, BLACK);
 
         desenharBotao(botaoPlantarSemente);
-        DrawText("Plantar uma semente!", 10, 120, 20, BLACK);
+        DrawText("Plantar uma semente!", 10, 240, 35, BLACK);
 
         desenharBotao(botaoVisualizarPlantas);
-        DrawText("Visualizar Plantas", 10, 180, 20, BLACK);
+        DrawText("Visualizar Plantas", 10, 360, 40, BLACK);
 
         desenharBotao(botaoAvancarDia);
-        DrawText("Avançar o dia", 10, 240, 20, BLACK);
+        DrawText("Avançar o dia", 10, 480, 40, BLACK);
 
         desenharBotao(botaoColherPlantas);
-        DrawText("Colher plantas", 10, 300, 20, BLACK);
+        DrawText("Colher plantas", 10, 600, 40, BLACK);
 
 
         if (verificarCliqueBotao(botaoPlantarSemente, mouse)) {
@@ -137,26 +153,40 @@ int main() {
         }
 
         if (verificarCliqueBotao(botaoAvancarDia, mouse)) {
-            processarAvancoDeDia(&fila, objetivo_atual, &dias_restantes, &opcao, msgFimDia1, msgFimDia2, &mostrarFimDia, &tempoFimDia);
+            processarAvancoDeDia(&fila, objetivo_atual, &dias_restantes, msgFimDia1, msgFimDia2, &mostrarFimDia, &tempoFimDia, &jogoFinalizado, &tempoFimJogo);
         }
 
         if (verificarCliqueBotao(botaoColherPlantas, mouse)) {
             colher(&fila, textoColheita1, textoColheita2, &mostrarMensagemColheita, &tempoMensagemColheita);
         }
 
+        if (mostrarLista && GetTime() - tempoLista < 15.0) {
+            listarPlantas_raylib(fila, 600, 450); // ajuste x/y conforme desejar
+        } else {
+            mostrarLista = false;
+        }
 
-        if (mostrarMensagemPlantar && GetTime() - tempoMensagemPlantar < 30.0) {
-            DrawText(textoPlantaSemente1, 300, 200, 20, DARKGREEN);
-            DrawText(textoPlantaSemente2, 300, 230, 20, DARKGREEN);
-            DrawText(textoPlantaSemente3, 300, 260, 20, DARKGREEN);
-            DrawText(textoPlantaSemente4, 300, 290, 20, DARKGREEN);
+
+        if (mostrarMensagemPlantar && GetTime() - tempoMensagemPlantar < 10.0) {
+            DrawText(textoPlantaSemente1, 600, 200+100, 20, BLACK);
+            DrawText(textoPlantaSemente2, 600, 230+100, 20, BLACK);
+            DrawText(textoPlantaSemente3, 600, 260+100, 20, BLACK);
+            DrawText(textoPlantaSemente4, 600, 290+100, 20, BLACK);
         } else {
             mostrarMensagemPlantar = false;
+        }
+        if (jogoFinalizado) {
+            if (GetTime() - tempoFimJogo < 2.0) {
+                DrawText("⏳ O tempo acabou!", 600, 600, 40, BLACK);
+                DrawText("🌟 Obrigado por jogar Colheita Mágica!", 600, 680, 40, BLACK);
+            } else {
+                break;
+            }
         }
 
 
 
-        ClearBackground(RAYWHITE);
+
 
         EndDrawing();
     }
@@ -219,15 +249,17 @@ void avancarDia(Fila *fila) {
 }
 
 
-void processarAvancoDeDia(Fila *fila, const Objetivo *objetivo_atual, int *dias_restantes, int *opcao,
-                          char *mensagem1, char *mensagem2, bool *mostrarMensagem, double *tempoMensagem) {
+void processarAvancoDeDia(Fila *fila, const Objetivo *objetivo_atual, int *dias_restantes,
+                          char *mensagem1, char *mensagem2, bool *mostrarMensagem, double *tempoMensagem,
+                          bool *jogoFinalizado, double *tempoFimJogo) {
     avancarDia(fila);
     (*dias_restantes)--;
 
     if (*dias_restantes == 0) {
-        *opcao = 0;
         *mostrarMensagem = true;
         *tempoMensagem = GetTime();
+        *tempoFimJogo = GetTime();
+        *jogoFinalizado = true;
 
         sprintf(mensagem1, "⏳ O tempo acabou!");
 
