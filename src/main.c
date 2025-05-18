@@ -215,6 +215,7 @@ void plantarSemente(Fila *fila, char* texto1, char* texto2, char* texto3, char* 
 
 void processarAvancoDeDia(Fila *fila, const Objetivo *objetivo_atual, int *dias_restantes, int *opcao) {
     avancarDia(fila);
+    printf("🌞 Um dia se passou. As plantas cresceram!\n");
     (*dias_restantes)--;
 
     if (*dias_restantes == 0) {
