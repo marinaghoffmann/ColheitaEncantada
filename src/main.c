@@ -1,5 +1,3 @@
-
-
 #include "../include/planta.h"
 #include "../include/jogo.h"
 #include "../include/menu.h"
@@ -37,6 +35,8 @@ void criarBotao (Botao *butao, Rectangle rect, Color color);
 void desenharBotao(Botao botao) {
     DrawRectangleRec(botao.rect, botao.color);
 }
+bool verificarCliqueBotao(Botao botao, Vector2 mouse);
+void listarPlantas_raylib(Fila fila, int x, int y_inicial);
 
 
 
@@ -52,8 +52,7 @@ int main() {
     const Objetivo *objetivo_atual = &objetivos[indice_objetivo];
     int dias_restantes = 10;
     char textoPlantaSemente1[256], textoPlantaSemente2[256], textoPlantaSemente3[256], textoPlantaSemente4[256];
-    bool mostrarMensagemPlantar = false;
-    double tempoMensagemPlantar = 0;
+
 
 
     const int screenWidth = 1600;
@@ -63,15 +62,18 @@ int main() {
     Botao botaoAvancarDia;
     Botao botaoColherPlantas;
 
-    double tempoInicio = 0;
-    bool mostrarMensagem = false;
+    bool mostrarMensagemPlantar = false;
+    double tempoMensagemPlantar = 0;
+
+    bool mostrarLista = false;
+    double tempoLista = 0;
 
     InitWindow(screenWidth, screenHeight, "Colheita Mágica");
 
-    criarBotao(&botaoPlantarSemente, (Rectangle){ screenWidth/2 - 110, screenHeight/2 - 50, 400, 100 }, RED);
-    criarBotao(&botaoVisualizarPlantas, (Rectangle){ screenWidth/2 - 110, screenHeight/2 - 200, 400, 100 }, RED);
-    criarBotao(&botaoAvancarDia, (Rectangle){ screenWidth/2 - 110, screenHeight/2 - 350, 400, 100 }, RED);
-    criarBotao(&botaoColherPlantas, (Rectangle){ screenWidth/2 - 110, screenHeight/2 - 500, 400, 100 }, RED);
+    criarBotao(&botaoPlantarSemente, (Rectangle){ 10, 120, 200, 50 }, RED);
+    criarBotao(&botaoVisualizarPlantas, (Rectangle){ 10, 180, 200, 50 }, RED);
+    criarBotao(&botaoAvancarDia, (Rectangle){ 10, 240, 200, 50 }, RED);
+    criarBotao(&botaoColherPlantas, (Rectangle){ 10, 300, 200, 50 }, RED);
 
 
     SetTargetFPS(60);
@@ -90,33 +92,35 @@ int main() {
         DrawText(texto3, 10, 100,12, BLACK);
 
         desenharBotao(botaoPlantarSemente);
-        DrawText("Plantar uma semente!", screenWidth/2 - 110, screenHeight/2 - 50, 20, BLACK);
+        DrawText("Plantar uma semente!", 10, 120, 20, BLACK);
 
         desenharBotao(botaoVisualizarPlantas);
-        DrawText("Visualizar Plantas", screenWidth/2 - 110, screenHeight/2 - 200, 20, BLACK);
+        DrawText("Visualizar Plantas", 10, 180, 20, BLACK);
 
         desenharBotao(botaoAvancarDia);
-        DrawText("Avançar o dia", screenWidth/2 - 110, screenHeight/2 - 350, 20, BLACK);
+        DrawText("Avançar o dia", 10, 240, 20, BLACK);
 
         desenharBotao(botaoColherPlantas);
-        DrawText("Colher plantas", screenWidth/2 - 110, screenHeight/2 - 500, 20, BLACK);
+        DrawText("Colher plantas", 10, 300, 20, BLACK);
 
 
         if (CheckCollisionPointRec(mouse, botaoPlantarSemente.rect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             plantarSemente(&fila, textoPlantaSemente1, textoPlantaSemente2, textoPlantaSemente3, textoPlantaSemente4, &mostrarMensagemPlantar, &tempoMensagemPlantar);
         }
         if (CheckCollisionPointRec(mouse, botaoVisualizarPlantas.rect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            //listarPlantas(fila);
+            listarPlantas_raylib(fila, 50, 310);
         }
 
-        if (mostrarMensagemPlantar && GetTime() - tempoMensagemPlantar < 10.0) {
-            DrawText(textoPlantaSemente1, 50, 200, 20, DARKGREEN);
-            DrawText(textoPlantaSemente2, 50, 230, 20, DARKGREEN);
-            DrawText(textoPlantaSemente3, 50, 260, 20, DARKGREEN);
-            DrawText(textoPlantaSemente4, 50, 290, 20, DARKGREEN);
+        if (mostrarMensagemPlantar && GetTime() - tempoMensagemPlantar < 30.0) {
+            DrawText(textoPlantaSemente1, 300, 200, 20, DARKGREEN);
+            DrawText(textoPlantaSemente2, 300, 230, 20, DARKGREEN);
+            DrawText(textoPlantaSemente3, 300, 260, 20, DARKGREEN);
+            DrawText(textoPlantaSemente4, 300, 290, 20, DARKGREEN);
         } else {
             mostrarMensagemPlantar = false;
         }
+
+
 
         ClearBackground(RAYWHITE);
 
@@ -126,7 +130,7 @@ int main() {
 
 
     do {
-        sprintf("\n📅 Dias Restantes Na Missão: %d dias\n", dias_restantes);
+        printf("\n📅 Dias Restantes Na Missão: %d dias\n", dias_restantes);
 
         menu();
         scanf("%d", &opcao);
@@ -138,7 +142,7 @@ int main() {
                 break;
             }
             case 2:
-                listarPlantas(fila);
+                //listarPlantas_raylib(fila);
                 break;
             case 3:
                 processarAvancoDeDia(&fila, objetivo_atual, &dias_restantes, &opcao);
@@ -229,4 +233,36 @@ void processarAvancoDeDia(Fila *fila, const Objetivo *objetivo_atual, int *dias_
 void criarBotao (Botao *butao, Rectangle rect, Color color) {
     butao->rect = rect;
     butao->color = color;
+}
+
+bool verificarCliqueBotao(Botao botao, Vector2 mouse) {
+    return CheckCollisionPointRec(mouse, botao.rect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+}
+
+void listarPlantas_raylib(Fila fila, int x, int y_inicial) {
+    ordenarPlantasPorColheita(&fila);
+
+    Planta* atual = fila.inicio;
+    int y = y_inicial;
+    int espacamento = 80; // altura entre cada planta
+
+    if (atual == NULL) {
+        DrawText("🌱 Nenhuma planta na fila.", x, y, 20, DARKGRAY);
+    } else {
+        while (atual != NULL) {
+            char texto1[256], texto2[256], texto3[256], texto4[256];
+
+            sprintf(texto1, "🌿 Nome: %s", atual->nome);
+            sprintf(texto2, "💌 Efeito: %s", atual->efeito);
+            sprintf(texto3, "✨ Necessidades: %s", atual->necessidades);
+            sprintf(texto4, "📅 Dias para colher: %d", atual->dias_para_colher);
+
+            DrawText(texto1, x, y, 20, DARKGREEN);       y += 20;
+            DrawText(texto2, x, y, 18, BLACK);           y += 20;
+            DrawText(texto3, x, y, 18, BLACK);           y += 20;
+            DrawText(texto4, x, y, 18, BLACK);           y += espacamento;
+
+            atual = atual->prox;
+        }
+    }
 }
