@@ -3,6 +3,8 @@
 #include "../include/menu.h"
 #include "../include/api.h"
 #include "../include/objetivo.h"
+#include "../include/item_magico.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -29,14 +31,26 @@ typedef struct Botao {
     Color color;
 }Botao;
 
+const ItemMagico itens_magicos[NUM_ITENS_MAGICOS] = {
+    {"Luz de Umbra", "Uma sombra que dança entre a luz e a escuridão, trazendo mistério e dúvida.", 1, 1},
+    {"Chuva de Éter", "Gotas mágicas que caem do céu, acelerando o crescimento das plantas.", 1, 2},
+    {"Raio de Sol", "Um feixe dourado que aquece a alma, mas pode queimar o que toca.", -1, 1},
+    {"Orvalho Lunar", "Uma névoa prateada que nutre as plantas, mas pode trazer frio indesejado.", 1, 1},
+    {"Adubo Estelar", "Poeira cósmica que enriquece o solo, mas pode sobrecarregar as raízes.", -1, 2}
+};
+
 void plantarSemente(Fila *fila, char* texto1, char* texto2, char* texto3, char* texto4, bool* mostrar, double* tempoInicio);
-void processarAvancoDeDia(Fila *fila, const Objetivo *objetivo_atual, int *dias_restantes, int *opcao);
+void processarAvancoDeDia(Fila *fila, const Objetivo *objetivo_atual, int *dias_restantes, int *opcao,
+                          char *mensagem1, char *mensagem2, bool *mostrarMensagem, double *tempoMensagem);
 void criarBotao (Botao *butao, Rectangle rect, Color color);
 void desenharBotao(Botao botao) {
     DrawRectangleRec(botao.rect, botao.color);
 }
 bool verificarCliqueBotao(Botao botao, Vector2 mouse);
 void listarPlantas_raylib(Fila fila, int x, int y_inicial);
+void avancarDia(Fila *fila);
+void usarItemMagico(Fila *fila);
+void colher(Fila* fila, char* texto1, char* texto2, bool* mostrar, double* tempoInicio);
 
 
 
@@ -64,9 +78,18 @@ int main() {
 
     bool mostrarMensagemPlantar = false;
     double tempoMensagemPlantar = 0;
+    char textoColheita1[256], textoColheita2[256];
+    bool mostrarMensagemColheita = false;
+    double tempoMensagemColheita = 0;
+
 
     bool mostrarLista = false;
     double tempoLista = 0;
+
+    // variaveis para função avancadia
+    char msgFimDia1[256], msgFimDia2[256];
+    bool mostrarFimDia = false;
+    double tempoFimDia = 0;
 
     InitWindow(screenWidth, screenHeight, "Colheita Mágica");
 
@@ -104,12 +127,23 @@ int main() {
         DrawText("Colher plantas", 10, 300, 20, BLACK);
 
 
-        if (CheckCollisionPointRec(mouse, botaoPlantarSemente.rect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        if (verificarCliqueBotao(botaoPlantarSemente, mouse)) {
             plantarSemente(&fila, textoPlantaSemente1, textoPlantaSemente2, textoPlantaSemente3, textoPlantaSemente4, &mostrarMensagemPlantar, &tempoMensagemPlantar);
         }
-        if (CheckCollisionPointRec(mouse, botaoVisualizarPlantas.rect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            listarPlantas_raylib(fila, 50, 310);
+
+        if (verificarCliqueBotao(botaoVisualizarPlantas, mouse)) {
+            mostrarLista = true;
+            tempoLista = GetTime();
         }
+
+        if (verificarCliqueBotao(botaoAvancarDia, mouse)) {
+            processarAvancoDeDia(&fila, objetivo_atual, &dias_restantes, &opcao, msgFimDia1, msgFimDia2, &mostrarFimDia, &tempoFimDia);
+        }
+
+        if (verificarCliqueBotao(botaoColherPlantas, mouse)) {
+            colher(&fila, textoColheita1, textoColheita2, &mostrarMensagemColheita, &tempoMensagemColheita);
+        }
+
 
         if (mostrarMensagemPlantar && GetTime() - tempoMensagemPlantar < 30.0) {
             DrawText(textoPlantaSemente1, 300, 200, 20, DARKGREEN);
@@ -126,47 +160,6 @@ int main() {
 
         EndDrawing();
     }
-
-
-
-    do {
-        printf("\n📅 Dias Restantes Na Missão: %d dias\n", dias_restantes);
-
-        menu();
-        scanf("%d", &opcao);
-        getchar();
-
-        switch (opcao) {
-            case 1: {// FEITO
-                plantarSemente(&fila, textoPlantaSemente1, textoPlantaSemente2, textoPlantaSemente3, textoPlantaSemente4, &mostrarMensagemPlantar, &tempoMensagemPlantar);
-                break;
-            }
-            case 2:
-                //listarPlantas_raylib(fila);
-                break;
-            case 3:
-                processarAvancoDeDia(&fila, objetivo_atual, &dias_restantes, &opcao);
-                break;
-            case 4:
-                colher(&fila);
-                break;
-            case 5:
-                printf("\n\n📜 Enigma da Missão: '%s'\n\n", objetivo_atual->descricao);
-                printf("🎯 Objetivo da Missão: Colher plantas com o efeito de %s e de %s! \n", objetivo_atual->nome1, objetivo_atual->nome2);
-                break;
-            case 0:
-                if (verificarObjetivo(&fila, objetivo_atual)) {
-                    printf("🎉 Parabéns! Você cumpriu o objetivo da missão!\n");
-                } else {
-                    printf("❌ Você não conseguiu cumprir o objetivo da missão.\n");
-                }
-                printf("Saindo do jogo...\n");
-                break;
-            default:
-                printf("Opção inválida.\n");
-        }
-
-    } while (opcao != 0);
 
     liberarFila(&fila);
 
@@ -213,21 +206,68 @@ void plantarSemente(Fila *fila, char* texto1, char* texto2, char* texto3, char* 
     }
 }
 
-void processarAvancoDeDia(Fila *fila, const Objetivo *objetivo_atual, int *dias_restantes, int *opcao) {
+void avancarDia(Fila *fila) {
+    usarItemMagico(fila);
+
+    Planta *atual = fila->inicio;
+    while (atual != NULL) {
+        if (atual->dias_para_colher > 0) {
+            atual->dias_para_colher--;
+        }
+        atual = atual->prox;
+    }
+}
+
+
+void processarAvancoDeDia(Fila *fila, const Objetivo *objetivo_atual, int *dias_restantes, int *opcao,
+                          char *mensagem1, char *mensagem2, bool *mostrarMensagem, double *tempoMensagem) {
     avancarDia(fila);
-    printf("🌞 Um dia se passou. As plantas cresceram!\n");
     (*dias_restantes)--;
 
     if (*dias_restantes == 0) {
-        printf("⏳ O tempo acabou!\n");
+        *opcao = 0;
+        *mostrarMensagem = true;
+        *tempoMensagem = GetTime();
+
+        sprintf(mensagem1, "⏳ O tempo acabou!");
 
         if (verificarObjetivo(fila, objetivo_atual)) {
-            printf("🎉 Parabéns! Você cumpriu o objetivo da missão!\n");
+            sprintf(mensagem2, "🎉 Parabéns! Você cumpriu o objetivo da missão!");
         } else {
-            printf("❌ Você não conseguiu cumprir o objetivo da missão.\n");
+            sprintf(mensagem2, "❌ Você não conseguiu cumprir o objetivo da missão.");
         }
+    }
+}
 
-        *opcao = 0; // encerra o jogo no switch
+void usarItemMagico(Fila *fila) {
+    srand(time(NULL));
+    int indice_item = rand() % NUM_ITENS_MAGICOS;
+    const ItemMagico *item = &itens_magicos[indice_item];
+
+    bool esperandoEscolha = true;
+    bool usouItem = false;
+
+    while (esperandoEscolha) {
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+
+        DrawText("✨ Item mágico disponível:", 50, 50, 20, PURPLE);
+        DrawText(item->nome, 300, 50, 20, DARKPURPLE);
+
+        DrawText("📜 Descrição:", 50, 90, 20, PURPLE);
+        DrawText(item->descricao, 200, 90, 20, DARKGRAY);
+
+        DrawText("Deseja usar este item? [S]im / [N]ão", 50, 140, 20, DARKBLUE);
+
+        EndDrawing();
+
+        if (IsKeyPressed(KEY_S)) {
+            usouItem = true;
+            esperandoEscolha = false;
+        } else if (IsKeyPressed(KEY_N)) {
+            usouItem = false;
+            esperandoEscolha = false;
+        }
     }
 }
 
@@ -266,4 +306,35 @@ void listarPlantas_raylib(Fila fila, int x, int y_inicial) {
             atual = atual->prox;
         }
     }
+}
+
+void colher(Fila* fila, char* texto1, char* texto2, bool* mostrar, double* tempoInicio) {
+    int colheuAlguma = 0;
+
+    if (fila->inicio != NULL && fila->inicio->dias_para_colher == 0) {
+        Planta* colhida = fila->inicio;
+        sprintf(texto1, "🧺 Colhendo planta: %s", colhida->nome);
+        fila->inicio = fila->inicio->prox;
+        free(colhida);
+        colheuAlguma = 1;
+    }
+
+    if (fila->inicio == NULL) {
+        fila->fim = NULL;
+    }
+
+    if (!colheuAlguma) {
+        if (fila->inicio != NULL) {
+            sprintf(texto1, "⏳ Próxima planta '%s' ainda não está pronta.", fila->inicio->nome);
+            sprintf(texto2, "⏳ Faltam %d dias para colher.", fila->inicio->dias_para_colher);
+        } else {
+            sprintf(texto1, "🌾 Nenhuma planta disponível para colheita no momento.");
+            texto2[0] = '\0';
+        }
+    } else {
+        texto2[0] = '\0';
+    }
+
+    *mostrar = true;
+    *tempoInicio = GetTime();
 }
