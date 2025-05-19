@@ -16,7 +16,7 @@
 - itemMagicoValido()
 
 ## 🔎 API  de inteligência artificial 
-Gemini (inteligência artifical do Google)
+Gemini (inteligência artificial do Google)
 Responsável por:
 - Tempo de colheita e efeitos especiais para cada nova semente plantada
 - Efeito que as plantas terão (entre cura, energia, proteção, clarividência e neutralização de venenos)
