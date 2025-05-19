@@ -34,6 +34,9 @@ Antes de compilar e executar o jogo, certifique-se de que você tem:
 - [Raylib](https://www.raylib.com/) (para interface gráfica)
 
 ## 🛠️ Como executar
+- Navegue até a pasta do projeto:  "cd ColheitaEncantada"
+- gcc src/main.c src/api.c src/menu.c src/planta.c src/objetivo.c src/jogo.c -o jogo.exe \
+-Iinclude -Iraylib/include -Lraylib/lib -lraylib -lcurl -lcjson -lopengl32 -lgdi32 -lwinmm
 
 
 ## 👩‍💻 Membros & Perfis do GitHub
