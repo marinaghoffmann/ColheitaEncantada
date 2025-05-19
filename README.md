@@ -1,21 +1,28 @@
-# Agricultura Mágica: A Colheita Encantada
-## Cultive sementes encantadas, acompanhe seu crescimento e colha no momento certo para obter o maior valor mágico possível.
+# Agricultura Mágica: A Colheita Encantada 🌱✨
+## Cultive e colha plantas mágicas ao longo de 30 dias virtuais, colhendo as plantas necessárias para o cumprimento, em menos ou exatos 10 dias, da dupla de tarefas que será sorteada. Você deve tomar decisões estratégicas sobre quando cuidar das suas plantas, usando itens mágicos que serão providos todos os dias.
 
-## 📦 Estrutura do Projeto
+## 🔮 Sobre o jogo
+- É desenvolvido na linguagem C
+- Tem uma IA integrada (Gemini)
+- Utiliza Raylib para a interface gráfica
 
-ColheitaEncantada/
+## ⚙️ Funções Principais
+- verificarObjetivo()
+- inicializarFila()
+- criarPlanta()
+- enqueue/dequeue()
+- ordenarPlantasPorColheita()
+- checarPlantasColhidas()
+- itemMagicoValido()
 
-├── Makefile
+## 🔎 API  de inteligência artificial 
+Gemini (inteligência artifical do Google)
+Responsável por:
+- Tempo de colheita e efeitos especiais para cada nova semente plantada
+- Efeito que as plantas terão (entre cura, energia, proteção, clarividência e neutralização de venenos)
+- Nomes criativos para as plantas, relacionados ao seu poder/efeito
+- Necessidades das plantas a serem supridas pelo uso dos itens mágicos
 
-├── src/
-
-│ ├── main.c
-
-│ └── api.c
-
-├── include/
-
-│ └── api.h
 
 
 ## ✅ Pré-requisitos
@@ -23,15 +30,10 @@ ColheitaEncantada/
 Antes de compilar e executar o jogo, certifique-se de que você tem:
 
 - [GCC](https://gcc.gnu.org/) (compilador C)
-- [make](https://www.gnu.org/software/make/)
 - [libcurl](https://curl.se/libcurl/) (para chamadas HTTP à API)
+- [Raylib](https://www.raylib.com/) (para interface gráfica)
 
-## 🛠️ Compilando o Projeto
-Navegue até a pasta do projeto:  "cd ColheitaEncantada"
-
-Compile com o make:  "make"
-
-Rode o executável:  "make run"
+## 🛠️ Como executar
 
 
 ## 👩‍💻 Membros & Perfis do GitHub
@@ -44,4 +46,7 @@ Rode o executável:  "make run"
   </li>
   <li>
     <a href="https://github.com/JoaoRafael04">João Rafael Andrade </a> 
+  </li>
+  <li>
+    <a href="https://github.com/LuisACCosta">Luís Augusto Costa </a> 
   </li>
